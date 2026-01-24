@@ -10,14 +10,13 @@ class CWord:
     start: tuple[int, int]
     vertical: bool
     question: str
+    num: int
 
 
 @dataclass
 class puzzle:
     words: list[CWord]
-    positions: list[
-        list[str]
-    ]  # (y, x) for everything! ALSO I figured this was easier than trying to have this be boolean, although that would make adding and removing words much more efficient.
+    positions: list[list[str]]
 
 
 def new_puzzle():
@@ -36,10 +35,19 @@ def print_puzzle(crossword):
     print("*" * 60)
     for i in crossword.positions:
         for j in i:
-            print(j, end="")
+            print(j, end=" ")
         print()
 
     print("*" * 60)
+    print("Down:")
+    for i in crossword.words:
+        if i.vertical:
+            print(f"{i.num}: {i.question}")
+
+    print("Across:")
+    for i in crossword.words:
+        if not i.vertical:
+            print(f"{i.num}: {i.question}")
 
 
 def check_and_add_word_to_position(cword, puz, intersection) -> bool:
@@ -69,14 +77,13 @@ def check_and_add_word_to_position(cword, puz, intersection) -> bool:
     return True
 
 
-def can_it_fit(word, crossword):
+def can_it_fit(word, crossword, question):
     for i in range(len(word)):
         c = word[i]
         for cword in crossword.words:
             for j in range(len(cword.word)):
                 char = cword.word[j]
                 if c == char:
-                    # check coords situation
                     if cword.vertical:
                         intersect = (cword.start[0] + j, cword.start[1])
                         new_start = (intersect[0], intersect[1] - i)
@@ -84,7 +91,8 @@ def can_it_fit(word, crossword):
                             word=word,
                             start=new_start,
                             vertical=False,
-                            question="Doesn't Matter",
+                            question=question,
+                            num=len(crossword.words) + 1,
                         )
                         ok = check_and_add_word_to_position(
                             new_cword, crossword, intersect
@@ -100,7 +108,8 @@ def can_it_fit(word, crossword):
                             word=word,
                             start=new_start,
                             vertical=True,
-                            question="Doesn't Matter",
+                            question=question,
+                            num=len(crossword.words) + 1,
                         )
                         ok = check_and_add_word_to_position(
                             new_cword, crossword, intersect
@@ -123,7 +132,7 @@ crossword = new_puzzle()
 # crossword.positions[5][4] = " P "
 # crossword.positions[5][5] = " A "
 # crossword.positions[5][6] = " R "
-cword = CWord(word="PAR", start=(4, 5), vertical=True, question="Doesn't Matter")
+cword = CWord(word="PAR", start=(4, 5), vertical=True, question="Golf Score", num=1)
 crossword.words.append(cword)
 crossword.positions[4][5] = " P "
 crossword.positions[5][5] = " A "
@@ -135,7 +144,15 @@ crossword.positions[6][5] = " R "
 # crossword.positions[5][3] = " A "
 # crossword.positions[6][3] = " D "
 print_puzzle(crossword)
-
-can_it_fit("STAB", crossword)
+can_it_fit("REVISIT", crossword, "To visit again")
+can_it_fit("VILE", crossword, "Something nasty")
 
 print_puzzle(crossword)
+
+
+# Pookie - A term of endearment
+# Labubu - Little Monster
+# Sonny Angel - 2 words: A nude travel companion
+# Blunt - 6 inches of heaven
+# Picasso - Third Child
+# Pandora - Grass Eater
